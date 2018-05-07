@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import { Tasks } from '../api/tasks.js';
+import { check } from 'meteor/check';
 
 // Components
 import Task from './Task.js';
@@ -13,7 +14,6 @@ class App extends Component {
   constructor(props) {
     super(props);
 
-    this.textInput = null;
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.toggleHideCompleted = this.toggleHideCompleted.bind(this);
@@ -49,11 +49,17 @@ class App extends Component {
 
     // Is it a Palindrom?
     if (App.isPalindrome(text)) {
-      Meteor.call('tasks.insert', text);
-      // Clear form
-      this.setState({ taskText: '', message: '' });
+      Meteor.call('tasks.insert', text, (err,result) => {   
+        // Check if error
+        if (err instanceof Object) {
+          this.setState({ message: err.error });
+        } else {
+          // Clear Form
+          this.setState({ taskText: '', message: '' })
+        }
+      });
     } else {
-      this.setState({ message:'Task is not a palindrom. Please try again' })
+      this.setState({ message: text + ' is not a palindrom. Please try again.' })
     }
   }
 
@@ -102,14 +108,13 @@ class App extends Component {
           <AccountsUIWrapper />
 
           <p id="message">{this.state.message}</p>
-          
+
           { this.props.currentUser ?
             <form className="new-task" onSubmit={this.handleSubmit} >
               <input
                 type="text"
                 name="taskText"
                 onChange={this.handleChange}
-                ref={this.setTextInputRef}
                 placeholder="Type to add new tasks"
                 value={this.state.taskText}
               />
@@ -141,7 +146,7 @@ App.propTypes = {
 };
 
 App.defaultProps = {
-  tasks: null,
+  tasks: [],
   incompleteCount: null,
   currentUser: null,
 };

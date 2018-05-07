@@ -109,6 +109,10 @@ header .hide-completed {
 .toggle-private {
   margin-left: 5px;
 }
+
+#message {
+  color: rgb(255,50,50);
+}
  
 @media (max-width: 600px) {
   li {

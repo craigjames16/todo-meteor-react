@@ -23,7 +23,6 @@ Meteor.methods({
     if (!this.userId) {
       throw new Meteor.Error('not-authorized');
     }
-
     Tasks.insert({
       text,
       createdAt: new Date(),

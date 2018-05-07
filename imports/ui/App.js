@@ -20,7 +20,8 @@ class App extends Component {
 
     this.state = {
       hideCompleted: false,
-      taskText: "",
+      taskText: '',
+      message: ''
     };
   }
 
@@ -30,7 +31,7 @@ class App extends Component {
     });
   }
 
-  isPalindrome(string) {
+  static isPalindrome(string) {
     // Remove non word characters
     const word = string.replace(/[^A-Z0-9]/ig, '').toLowerCase();
 
@@ -47,14 +48,13 @@ class App extends Component {
     const text = this.state.taskText;
 
     // Is it a Palindrom?
-    if (this.isPalindrome(text)) {
+    if (App.isPalindrome(text)) {
       Meteor.call('tasks.insert', text);
+      // Clear form
+      this.setState({ taskText: '', message: '' });
     } else {
-      alert('Not a palindrom. Fix it.');
+      this.setState({ message:'Task is not a palindrom. Please try again' })
     }
-
-    // Clear form
-    this.setState({ taskText: '' });
   }
 
   handleChange(e) {
@@ -101,6 +101,8 @@ class App extends Component {
 
           <AccountsUIWrapper />
 
+          <p id="message">{this.state.message}</p>
+          
           { this.props.currentUser ?
             <form className="new-task" onSubmit={this.handleSubmit} >
               <input
